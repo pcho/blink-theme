@@ -33,7 +33,6 @@
     url("https://blink.sh/fonts/pragmatapro_mono_b_liga_0827-webfont.woff")
       format("woff");
 }
-
 html {
   @apply antialiased;
   font-size: 16px;
@@ -424,10 +423,6 @@ blockquote:not(:first-child),
 .nextra-body {
   &.full {
     width: 100%;
-    &.expand {
-      width: 100vw;
-      margin: 0 calc(50% - 50vw);
-    }
   }
 }
 article {
@@ -552,7 +547,7 @@ article {
 /* Search */
 .nextra-search {
   input {
-    @apply bg-black/[.03] text-sm text-gray-900;
+    @apply bg-black/[.03] md:text-sm text-base text-gray-900;
     @apply dark:bg-gray-50/10 dark:text-gray-300;
     @apply dark:border-gray-800;
   }

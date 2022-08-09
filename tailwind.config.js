@@ -40,7 +40,7 @@ module.exports = {
       black: '#000',
       white: '#fff',
       gray: colors.zinc,
-      slate: colors.zinc,
+      slate: colors.zince,
       neutral: colors.zinc,
       red: colors.red,
       orange: colors.orange,

@@ -1,34 +1,24 @@
 {
   "name": "nextra-theme-blinkshell",
-  "version": "2.0.0-beta.16",
+  "version": "2.0.0-beta.17",
   "description": "Modified nextra-theme-docs for Blink Shell documentation site.",
   "repository": "https://github.com/blinksh/docs",
   "author": "Shu Ding <g@shud.in>",
   "contributors": [
     "Blink Shell <hello@blink.sh>"
   ],
-  "homepage": "https://docs.blink.sh",
   "license": "MIT",
   "files": [
     "dist",
     "style.css"
   ],
+  "sideEffects": [
+    "./src/polyfill.ts"
+  ],
   "typesVersions": {
     "*": {
       ".": [
         "./dist/index.d.ts"
-      ],
-      "callout": [
-        "./dist/callout.d.ts"
-      ],
-      "bleed": [
-        "./dist/bleed.d.ts"
-      ],
-      "tabs": [
-        "./dist/tabs.d.ts"
-      ],
-      "collapse": [
-        "./dist/collapse.d.ts"
       ]
     }
   },
@@ -38,33 +28,18 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./callout": {
-      "import": "./dist/callout.js",
-      "types": "./dist/callout.d.ts"
-    },
-    "./bleed": {
-      "import": "./dist/bleed.js",
-      "types": "./dist/bleed.d.ts"
-    },
-    "./tabs": {
-      "import": "./dist/tabs.js",
-      "types": "./dist/tabs.d.ts"
-    },
-    "./collapse": {
-      "import": "./dist/collapse.js",
-      "types": "./dist/collapse.d.ts"
     }
   },
   "scripts": {
     "dev": "concurrently \"pnpm dev:layout\" \"pnpm dev:tailwind\"",
-    "build": "concurrently \"tsup\" \"cross-env NODE_ENV=production pnpm postcss src/styles.css -o style.css --verbose\"",
+    "build": "tsup",
+    "build:all": "pnpm build && pnpm run build:tailwind",
     "build:tailwind": "cross-env NODE_ENV=production pnpm postcss src/styles.css -o style.css --verbose",
     "types": "tsup --dts-only",
     "types:check": "tsc --noEmit",
     "dev:layout": "tsup --watch",
     "dev:tailwind": "cross-env TAILWIND_MODE=watch pnpm postcss src/styles.css -o style.css --watch",
-    "prepublishOnly": "pnpm build",
+    "prepublishOnly": "pnpm build:all",
     "test": "vitest --run",
     "clean": "rimraf ./dist ./style.css",
     "format": "prettier --ignore-path ../../.gitignore --write --list-different ."
@@ -90,33 +65,27 @@
     "react-dom": ">=16.13.1"
   },
   "devDependencies": {
-    "vitest": "^0.19.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@mdx-js/react": "^2.1.2",
-    "next-themes": "^0.2.0-beta.2",
-    "next": "^12.2.3",
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
-    "postcss": "^8.4.14",
-    "postcss-cli": "^8.3.1",
-    "autoprefixer": "^10.4.7",
-    "cssnano": "^5.1.12",
-    "tailwindcss": "^3.1.6",
     "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
     "@tailwindcss/typography": "^0.5.4",
-    "tsup": "^6.2.0",
+    "@types/flexsearch": "^0.7.3",
+    "@types/github-slugger": "^1.3.0",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "autoprefixer": "^10.4.8",
     "concurrently": "^7.3.0",
     "cross-env": "^7.0.3",
-    "@types/flexsearch": "^0.7.3",
+    "cssnano": "^5.1.12",
     "cssnano-preset-advanced": "^5.3.8",
-    "nextra": "^2.0.0-beta.14",
-    "postcss-import": "^14.1.0",
-    "prettier": "^2.7.1",
-    "prettier-plugin-tailwindcss": "^0.1.13",
-    "rimraf": "^3.0.2",
-    "turbo": "^1.4.0",
-    "typescript": "^4.7.4"
+    "next": "^12.2.4",
+    "nextra": "^2.0.0-beta.16",
+    "postcss": "^8.4.14",
+    "postcss-cli": "^8.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.1.8",
+    "tsup": "^6.2.1",
+    "vitest": "^0.21.0",
+    "postcss-import": "^14.1.0"
   },
   "prettier": {
     "semi": false,

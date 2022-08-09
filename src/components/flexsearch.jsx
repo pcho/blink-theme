@@ -11,11 +11,11 @@ import cn from 'classnames'
 import FlexSearch from 'flexsearch'
 import { Transition } from '@headlessui/react'
 
-import { useConfig } from './config'
-import renderComponent from './utils/render-component'
-import useMenuContext from './utils/menu-context'
+import { useConfig } from '../config'
+import renderComponent from '../utils/render-component'
+import useMenuContext from '../utils/menu-context'
 import { SpinnerIcon } from 'nextra/icons'
-import Anchor from './components/anchor'
+import { Anchor } from './anchor'
 
 const Item = ({
   page,
@@ -86,7 +86,7 @@ const MemoedStringWithMatchHighlights = memo(
 // This can be global for better caching.
 const indexes = {}
 
-export default function Search() {
+export function Flexsearch() {
   const config = useConfig()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -409,34 +409,36 @@ export default function Search() {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <ul className="absolute top-full z-20 m-0 mt-2 list-none overflow-hidden overscroll-contain rounded-xl px-0 py-2.5 shadow-xl">
-          {loading ? (
-            <span className="flex select-none justify-center p-8 text-center text-sm text-gray-400">
-              <SpinnerIcon className="-ml-1 mr-2 h-5 w-5 animate-spin text-gray-400" />
-              <span>Loading...</span>
-            </span>
-          ) : results.length === 0 ? (
-            renderComponent(config.unstable_searchResultEmpty, {
-              locale: router.locale
-            })
-          ) : (
-            results.map((res, i) => {
-              return (
-                <Item
-                  first={res.first}
-                  key={`search-item-${i}`}
-                  page={res.page}
-                  title={res.title}
-                  href={router.basePath + res.route}
-                  excerpt={res.excerpt}
-                  active={i === active}
-                  onHover={() => setActive(i)}
-                  onClick={finishSearch}
-                />
-              )
-            })
-          )}
-        </ul>
+        <Transition.Child>
+          <ul className="absolute top-full z-20 m-0 mt-2 list-none overflow-hidden overscroll-contain rounded-xl px-0 py-2.5 shadow-xl">
+            {loading ? (
+              <span className="flex select-none justify-center p-8 text-center text-sm text-gray-400">
+                <SpinnerIcon className="-ml-1 mr-2 h-5 w-5 animate-spin text-gray-400" />
+                <span>Loading...</span>
+              </span>
+            ) : results.length === 0 ? (
+              renderComponent(config.unstable_searchResultEmpty, {
+                locale: router.locale
+              })
+            ) : (
+              results.map((res, i) => {
+                return (
+                  <Item
+                    first={res.first}
+                    key={`search-item-${i}`}
+                    page={res.page}
+                    title={res.title}
+                    href={router.basePath + res.route}
+                    excerpt={res.excerpt}
+                    active={i === active}
+                    onHover={() => setActive(i)}
+                    onClick={finishSearch}
+                  />
+                )
+              })
+            )}
+          </ul>
+        </Transition.Child>
       </Transition>
     </div>
   )

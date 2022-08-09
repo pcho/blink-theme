@@ -9,21 +9,25 @@ import { SkipNavContent } from '@reach/skip-nav'
 import { ThemeProvider } from 'next-themes'
 import cn from 'classnames'
 
-import Head from './head'
-import Navbar from './navbar'
-import Footer, { NavLinks } from './footer'
-import { MDXTheme } from './misc/theme'
-import Sidebar from './sidebar'
-import ToC from './toc'
+import './polyfill'
+import {
+  Head,
+  Navbar,
+  Footer,
+  NavLinks,
+  Sidebar,
+  TOC,
+  Breadcrumb,
+  Banner
+} from './components'
+import { MDXTheme } from './mdx-theme'
 import { ThemeConfigContext, useConfig } from './config'
-import { ActiveAnchor } from './misc/active-anchor'
-import defaultConfig from './misc/default.config'
+import { ActiveAnchor } from './active-anchor'
+import { DEFAULT_THEME } from './constants'
 import { getFSRoute } from './utils/get-fs-route'
 import { MenuContext } from './utils/menu-context'
 import normalizePages from './utils/normalize-pages'
 import { DocsThemeConfig, PageTheme } from './types'
-import './polyfill'
-import Breadcrumb from './breadcrumb'
 import renderComponent from './utils/render-component'
 
 let resizeObserver: ResizeObserver
@@ -115,7 +119,7 @@ const Body = ({
           {navLinks}
         </article>
       ) : themeContext.layout === 'raw' ? (
-        <div className="nextra-body full expand relative overflow-x-hidden">
+        <div className="nextra-body full relative overflow-x-hidden">
           {children}
         </div>
       ) : (
@@ -212,6 +216,7 @@ const InnerLayout = ({
           'menu-active': menu
         })}
       >
+        <Banner />
         {themeContext.navbar ? (
           <Navbar
             isRTL={isRTL}
@@ -220,7 +225,12 @@ const InnerLayout = ({
           />
         ) : null}
         <ActiveAnchor>
-          <div className="mx-auto flex w-full max-w-[90rem] flex-1 items-stretch">
+          <div
+            className={cn(
+              'mx-auto flex w-full flex-1 items-stretch',
+              themeContext.layout === 'raw' ? '' : 'max-w-[90rem]'
+            )}
+          >
             <div className="flex w-full flex-1">
               <Sidebar
                 docsDirectories={docsDirectories}
@@ -239,7 +249,7 @@ const InnerLayout = ({
                   <div className="nextra-toc order-last hidden w-64 flex-shrink-0 px-4 text-sm xl:block" />
                 )
               ) : (
-                <ToC
+                <TOC
                   headings={config.floatTOC ? headings : null}
                   filepathWithName={filepathWithName}
                 />
@@ -290,7 +300,7 @@ function Layout(props: any) {
   if (!context) throw new Error(`No content found for ${route}.`)
 
   const extendedConfig = {
-    ...defaultConfig,
+    ...DEFAULT_THEME,
     ...context.themeConfig,
     unstable_flexsearch: context.pageOpts.unstable_flexsearch,
     newNextLinkBehavior: context.pageOpts.newNextLinkBehavior
@@ -332,5 +342,8 @@ export default function withLayout(
   return Layout
 }
 
+export { useConfig }
+export { useTheme } from 'next-themes'
 export * from './types'
-export { getComponents } from './misc/theme'
+export { getComponents } from './mdx-theme'
+export { Bleed, Callout, Collapse, Tabs, Tab } from './components'
