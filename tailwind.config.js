@@ -12,6 +12,9 @@ const makePrimaryColor =
 module.exports = {
   content: ['./src/**/*.{jsx,tsx}'],
   theme: {
+    fontFamily: {
+      mono: ['PragmataPro', ...defaultTheme.fontFamily.mono]
+    },
     screens: {
       sm: '640px',
       md: '768px',
