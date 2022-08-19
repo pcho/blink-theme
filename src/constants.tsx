@@ -1,5 +1,10 @@
 import React from 'react'
 import { DocsThemeConfig, PageTheme } from './types'
+import { useRouter } from 'next/router'
+
+export const DEFAULT_LOCALE = 'en-US'
+
+export const IS_BROWSER = typeof window !== 'undefined'
 
 export const DEFAULT_THEME: DocsThemeConfig = {
   projectLink: 'https://github.com/shuding/nextra',
@@ -28,9 +33,9 @@ export const DEFAULT_THEME: DocsThemeConfig = {
       </span>
     </>
   ),
-  head: (
+  head: () => (
     <>
-      <meta name="msapplication-TileColor" content="#ffffff" />
+      <meta name="msapplication-TileColor" content="#fff" />
       <meta httpEquiv="Content-Language" content="en" />
       <meta name="description" content="Nextra: the next docs builder" />
       <meta name="twitter:card" content="summary_large_image" />
@@ -40,7 +45,8 @@ export const DEFAULT_THEME: DocsThemeConfig = {
       <meta name="apple-mobile-web-app-title" content="Nextra" />
     </>
   ),
-  searchPlaceholder({ locale }) {
+  searchPlaceholder() {
+    const { locale } = useRouter()
     if (locale === 'zh-CN') return '搜索文档...'
     return 'Search documentation...'
   },
@@ -50,6 +56,10 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     </span>
   ),
   bannerKey: 'nextra-banner',
+  notFoundLink: 'Submit an issue about broken link →',
+  notFoundLabels: 'bug',
+  serverSideErrorLink: 'Submit an issue about error in url →',
+  serverSideErrorLabels: 'bug'
   // direction: 'ltr',
   // i18n: [{ locale: 'en-US', text: 'English', direction: 'ltr' }],
 }
@@ -62,5 +72,6 @@ export const DEFAULT_PAGE_THEME: PageTheme = {
   footer: true,
   layout: 'default',
   typesetting: 'default',
-  breadcrumb: true
+  breadcrumb: true,
+  timestamp: true
 }

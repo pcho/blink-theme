@@ -1,24 +1,27 @@
-import React, { useState, useEffect, useMemo, ReactElement } from 'react'
-import cn from 'classnames'
+import React, { useState, useEffect, useMemo, ReactElement, memo } from 'react'
+import cn from 'clsx'
 import Slugger from 'github-slugger'
 import { useRouter } from 'next/router'
 import { Heading } from 'nextra'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import { useActiveAnchor } from '../active-anchor'
-import { getFSRoute } from '../utils/get-fs-route'
-import useMenuContext from '../utils/menu-context'
-import { Search } from './search'
+import { MatchSorterSearch } from './match-sorter-search'
 import { Flexsearch } from './flexsearch'
-import { useConfig } from '../config'
-import getHeadingText from '../utils/get-heading-text'
-import { Item, MenuItem, PageItem } from '../utils/normalize-pages'
+import { useConfig, useMenu, useActiveAnchor } from '../contexts'
+import {
+  Item,
+  MenuItem,
+  PageItem,
+  getFSRoute,
+  getHeadingText,
+  renderComponent
+} from '../utils'
 import { LocaleSwitch } from './locale-switch'
 import ThemeSwitch from './theme-switch'
 import { ArrowRightIcon } from 'nextra/icons'
 import { Collapse } from './collapse'
-import renderComponent from '../utils/render-component'
 import { Anchor } from './anchor'
+import { DEFAULT_LOCALE } from '../constants'
 
 const TreeState: Record<string, boolean> = {}
 
@@ -27,23 +30,22 @@ interface FolderProps {
   anchors: string[]
 }
 
-const Folder = React.memo(FolderImpl)
+const Folder = memo(FolderImpl)
 
 function FolderImpl({ item, anchors }: FolderProps) {
-  const { asPath, locale } = useRouter()
+  const { asPath, locale = DEFAULT_LOCALE } = useRouter()
   const routeOriginal = getFSRoute(asPath, locale)
-  const route = routeOriginal.split('#')[0]
-  const active = route === item.route + '/' || route + '/' === item.route + '/'
+  const [route] = routeOriginal.split('#')
+  const active = [route, route + '/'].includes(item.route + '/')
   const activeRouteInside = active || route.startsWith(item.route + '/')
 
-  const { defaultMenuCollapsed } = useMenuContext()
+  const { defaultMenuCollapsed, setMenu } = useMenu()
   const open =
-    typeof TreeState[item.route] !== 'undefined'
+    TreeState[item.route] !== undefined
       ? TreeState[item.route]
       : active || activeRouteInside || !defaultMenuCollapsed
 
   const rerender = useState({})[1]
-  const { setMenu } = useMenuContext()
 
   useEffect(() => {
     if (activeRouteInside) {
@@ -54,7 +56,7 @@ function FolderImpl({ item, anchors }: FolderProps) {
   const link = (
     <Anchor
       href={(item as Item).withIndexPage ? item.route : ''}
-      className="cursor-pointer"
+      className="cursor-pointer !flex gap-2 items-center justify-between [word-break:break-word]"
       onClick={e => {
         const clickedToggleIcon = ['svg', 'path'].includes(
           (e.target as HTMLElement).tagName.toLowerCase()
@@ -63,7 +65,7 @@ function FolderImpl({ item, anchors }: FolderProps) {
           e.preventDefault()
         }
         if ((item as Item).withIndexPage) {
-          // If it's focused, we toggle it. Otherwise always open it.
+          // If it's focused, we toggle it. Otherwise, always open it.
           if (active || clickedToggleIcon) {
             TreeState[item.route] = !open
           } else {
@@ -78,17 +80,15 @@ function FolderImpl({ item, anchors }: FolderProps) {
         rerender({})
       }}
     >
-      <span className="flex items-center justify-between">
-        {item.title}
-        <ArrowRightIcon
-          height="1em"
-          className={cn(
-            'ml-2 h-[18px] min-w-[18px] rounded-sm p-[2px] hover:bg-gray-800/5 dark:hover:bg-gray-100/5',
-            '[&>path]:origin-center [&>path]:transition-transform',
-            open && '[&>path]:rotate-90'
-          )}
-        />
-      </span>
+      {item.title}
+      <ArrowRightIcon
+        height="1em"
+        className={cn(
+          'h-[18px] min-w-[18px] rounded-sm p-0.5 hover:bg-gray-800/5 dark:hover:bg-gray-100/5',
+          '[&>path]:origin-center [&>path]:transition-transform rtl:[&>path]:-rotate-180',
+          open && 'ltr:[&>path]:rotate-90 rtl:[&>path]:rotate-[-270deg]'
+        )}
+      />
     </Anchor>
   )
 
@@ -146,11 +146,10 @@ interface SeparatorProps {
   topLevel: boolean
 }
 
-function Separator({ title, topLevel }: SeparatorProps) {
+function Separator({ title, topLevel }: SeparatorProps): ReactElement {
+  // since title can be empty string ''
   const hasTitle = title !== undefined
-
   const { sidebarSubtitle } = useConfig()
-
   return (
     <li
       className={cn(
@@ -160,7 +159,7 @@ function Separator({ title, topLevel }: SeparatorProps) {
       )}
     >
       {hasTitle ? (
-        <div className="mx-2 py-1.5 text-sm font-semibold text-gray-900 no-underline dark:text-gray-100">
+        <div className="mx-2 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-100">
           {sidebarSubtitle
             ? renderComponent(sidebarSubtitle, { title })
             : title}
@@ -179,82 +178,54 @@ interface FileProps {
 }
 
 function File({ item, anchors, topLevel }: FileProps): ReactElement {
-  const { asPath, locale } = useRouter()
+  const { asPath, locale = DEFAULT_LOCALE } = useRouter()
   const route = getFSRoute(asPath, locale)
   const active = [route, route + '/'].includes(item.route + '/')
   const slugger = new Slugger()
   const activeAnchor = useActiveAnchor()
-  const { setMenu } = useMenuContext()
+  const { setMenu } = useMenu()
 
   if (item.type === 'separator') {
     return <Separator title={item.title} topLevel={topLevel} />
   }
 
-  if (anchors?.length) {
-    if (active) {
-      let activeIndex = 0
-      const anchorInfo = anchors.map((text, i) => {
-        const slug = slugger.slug(text)
-        if (activeAnchor[slug]?.isActive) {
-          activeIndex = i
-        }
-        return { text, slug }
-      })
-
-      return (
-        <li className={cn(active && 'active', 'break-words')}>
-          <Anchor
-            href={(item as PageItem).href || item.route}
-            newWindow={(item as PageItem).newWindow}
-            className="break-words"
-            onClick={() => {
-              setMenu(false)
-            }}
-          >
-            {item.title}
-          </Anchor>
-          <ul>
-            {anchors.map((_, i) => {
-              const { slug, text } = anchorInfo[i]
-              const isActive = i === activeIndex
-
-              return (
-                <li key={`a-${slug}`}>
-                  <a
-                    href={'#' + slug}
-                    className={isActive ? 'active-anchor' : ''}
-                    onClick={() => {
-                      setMenu(false)
-                    }}
-                  >
-                    <span className="flex text-sm w-full">
-                      <span className="opacity-25">#</span>
-                      <span className="mr-2" />
-                      <span className="inline-block w-full break-words">
-                        {text}
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </li>
-      )
-    }
-  }
-
   return (
-    <li className={cn(active && 'active', 'break-words')}>
+    <li className={cn({ active })}>
       <Anchor
         href={(item as PageItem).href || item.route}
         newWindow={(item as PageItem).newWindow}
+        className="break-words"
         onClick={() => {
           setMenu(false)
         }}
       >
         {item.title}
       </Anchor>
+      {active && anchors.length > 0 && (
+        <ul>
+          {anchors.map((text, i) => {
+            const slug = slugger.slug(text)
+            return (
+              <li key={`a-${slug}`}>
+                <a
+                  href={`#${slug}`}
+                  className={cn(
+                    '!flex text-sm w-full [word-break:break-word]',
+                    'before:opacity-25 before:mr-2 before:content-["#"]',
+                    activeAnchor[slug]?.isActive &&
+                      'font-semibold !text-gray-900 dark:!text-white'
+                  )}
+                  onClick={() => {
+                    setMenu(false)
+                  }}
+                >
+                  {text}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </li>
   )
 }
@@ -295,7 +266,6 @@ interface SideBarProps {
   fullDirectories: Item[]
   asPopover?: boolean
   headings?: Heading[]
-  isRTL?: boolean
   includePlaceholder: boolean
 }
 
@@ -310,16 +280,16 @@ export function Sidebar({
   includePlaceholder
 }: SideBarProps): ReactElement {
   const config = useConfig()
+  const { menu } = useMenu()
   const anchors = useMemo(
     () =>
       headings
         .filter(v => v.children && v.depth === 2 && v.type === 'heading')
-        .map(v => getHeadingText(v))
+        .map(getHeadingText)
         .filter(Boolean),
     [headings]
   )
 
-  const { menu } = useMenuContext()
   useEffect(() => {
     if (menu) {
       document.body.classList.add('overflow-hidden', 'md:overflow-auto')
@@ -364,7 +334,7 @@ export function Sidebar({
                   config.unstable_flexsearch ? (
                     <Flexsearch />
                   ) : (
-                    <Search directories={flatDirectories} />
+                    <MatchSorterSearch directories={flatDirectories} />
                   )
                 ) : null)}
             </div>
@@ -372,55 +342,33 @@ export function Sidebar({
               <Menu
                 // The sidebar menu, shows only the docs directories.
                 directories={docsDirectories}
-                anchors={
-                  // When the viewport size is larger than `md`, hide the anchors in
-                  // the sidebar when `floatTOC` is enabled.
-                  config.floatTOC ? [] : anchors
-                }
+                // When the viewport size is larger than `md`, hide the anchors in
+                // the sidebar when `floatTOC` is enabled.
+                anchors={config.floatTOC ? [] : anchors}
               />
             </div>
             <div className="md:hidden">
               <Menu
                 // The mobile dropdown menu, shows all the directories.
                 directories={fullDirectories}
-                anchors={
-                  // Always show the anchor links on mobile (`md`).
-                  anchors
-                }
+                // Always show the anchor links on mobile (`md`).
+                anchors={anchors}
               />
             </div>
           </div>
 
-          {!hasMenu ? null : (
+          {hasMenu && (
             <div className="nextra-sidebar-menu mx-4 border-t shadow-[0_-12px_16px_white] dark:border-neutral-800 dark:shadow-[0_-12px_16px_#111]">
-              <div className="flex gap-1 bg-white py-4 pb-4 dark:bg-dark">
+              <div className="flex gap-1 bg-white py-4 pb-4 dark:bg-dark justify-between">
                 {config.i18n ? (
-                  <div className="relative flex-1">
+                  <div className="relative">
                     <LocaleSwitch options={config.i18n} />
                   </div>
                 ) : null}
                 {config.darkMode ? (
-                  <>
-                    <div
-                      className={cn('relative md:hidden', {
-                        locale: config.i18n,
-                        'flex-1': !config.i18n
-                      })}
-                    >
-                      <ThemeSwitch lite={false} />
-                    </div>
-                    <div
-                      className={cn(
-                        'relative hidden md:block',
-                        {
-                          locale: config.i18n
-                        },
-                        config.i18n ? 'grow-0' : 'flex-1'
-                      )}
-                    >
-                      <ThemeSwitch lite={!!config.i18n} />
-                    </div>
-                  </>
+                  <div className="relative">
+                    <ThemeSwitch lite={!!config.i18n} />
+                  </div>
                 ) : null}
               </div>
             </div>

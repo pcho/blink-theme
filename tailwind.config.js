@@ -11,7 +11,7 @@ const makePrimaryColor =
   }
 
 module.exports = {
-  content: ['./src/**/*.{jsx,tsx}'],
+  content: ['./src/**/*.tsx', '../nextra/src/icons/*.tsx'],
   theme: {
     fontFamily: {
       mono: ['PragmataPro', ...defaultTheme.fontFamily.mono]

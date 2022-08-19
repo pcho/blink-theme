@@ -2,15 +2,16 @@ import React, { memo, ReactElement } from 'react'
 import { useTheme } from 'next-themes'
 import { Select } from './select'
 import { SunIcon, MoonIcon } from 'nextra/icons'
+import { useMounted } from '../utils'
 
 export function ThemeSwitch({ lite = true }): ReactElement {
   const { theme, setTheme, systemTheme } = useTheme()
   const renderedTheme = theme === 'system' ? systemTheme : theme
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
+  const mounted = useMounted()
 
   return (
     <Select
+      position={lite ? 'right' : 'left'}
       onChange={option => {
         setTheme(option.key)
       }}
@@ -23,7 +24,9 @@ export function ThemeSwitch({ lite = true }): ReactElement {
             ) : (
               <SunIcon className="h-4 w-4 [&>path]:fill-current" />
             )}
-            {lite ? '' : <span>{mounted ? theme : 'light'}</span>}
+            <span className={lite ? 'md:hidden' : ''}>
+              {mounted ? theme : 'light'}
+            </span>
           </div>
         )
       }}
