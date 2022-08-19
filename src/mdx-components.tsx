@@ -212,7 +212,10 @@ export const getComponents = ({
   const context = { index: 0 }
   return {
     h1: (props: ComponentProps<'h1'>) => (
-      <h1 className="mt-2 text-4xl font-bold tracking-tight" {...props} />
+      <h1
+        className="mt-2 text-4xl font-mono uppercase font-bold tracking-tight"
+        {...props}
+      />
     ),
     h2: createHeaderLink('h2', context),
     h3: createHeaderLink('h3', context),
