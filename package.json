@@ -1,6 +1,6 @@
 {
   "name": "nextra-theme-blinkshell",
-  "version": "2.0.0-beta.20",
+  "version": "2.0.0-beta.21",
   "description": "Modified nextra-theme-docs for Blink Shell documentation site.",
   "repository": "https://github.com/blinksh/docs",
   "author": "Shu Ding <g@shud.in>",
