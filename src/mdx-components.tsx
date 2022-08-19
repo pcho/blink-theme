@@ -217,11 +217,36 @@ export const getComponents = ({
         {...props}
       />
     ),
-    h2: createHeaderLink('h2', context),
-    h3: createHeaderLink('h3', context),
-    h4: createHeaderLink('h4', context),
-    h5: createHeaderLink('h5', context),
-    h6: createHeaderLink('h6', context),
+    h2: (props: ComponentProps<'h2'>) => (
+      <h1
+        className="mt-2 text-3xl font-mono uppercase font-bold tracking-tight"
+        {...props}
+      />
+    ),
+    h3: (props: ComponentProps<'h3'>) => (
+      <h1
+        className="mt-2 text-2xl font-mono font-semibold tracking-tight"
+        {...props}
+      />
+    ),
+    h4: (props: ComponentProps<'h4'>) => (
+      <h1
+        className="mt-2 text-xl font-mono font-bold tracking-tight"
+        {...props}
+      />
+    ),
+    h5: (props: ComponentProps<'h5'>) => (
+      <h1
+        className="mt-2 text-lg font-mono font-bold tracking-tight"
+        {...props}
+      />
+    ),
+    h6: (props: ComponentProps<'h6'>) => (
+      <h1
+        className="mt-2 text-base font-mono font-bold tracking-tight"
+        {...props}
+      />
+    ),
     ul: (props: ComponentProps<'ul'>) => (
       <ul className="ltr:ml-6 rtl:mr-6 mt-6 list-disc first:mt-0" {...props} />
     ),

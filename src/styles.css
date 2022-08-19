@@ -358,25 +358,12 @@ article {
     font-size: 17px;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     h1 {
-      @apply mt-6 mb-4 font-mono uppercase text-center;
+      @apply mt-6 mb-4 text-center;
       font-size: 2.5rem;
     }
     h2 {
-      @apply font-mono uppercase border-none;
+      @apply border-none;
     }
-
-  h3 {
-    @apply mt-8 font-mono text-2xl font-semibold tracking-tight;
-  }
-  h4 {
-    @apply mt-8 font-mono text-xl font-semibold tracking-tight;
-  }
-  h5 {
-    @apply mt-8 font-mono text-lg font-semibold tracking-tight;
-  }
-  h6 {
-    @apply mt-8 font-mono text-base font-semibold tracking-tight;
-  }
     a {
       @apply no-underline hover:underline;
     }
