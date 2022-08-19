@@ -219,31 +219,31 @@ export const getComponents = ({
     ),
     h2: (props: ComponentProps<'h2'>) => (
       <h1
-        className="mt-2 text-3xl font-mono uppercase font-bold tracking-tight"
+        className="mt-10 text-3xl font-mono uppercase font-bold tracking-tight"
         {...props}
       />
     ),
     h3: (props: ComponentProps<'h3'>) => (
       <h1
-        className="mt-2 text-2xl font-mono font-semibold tracking-tight"
+        className="mt-8 text-2xl font-mono font-semibold tracking-tight"
         {...props}
       />
     ),
     h4: (props: ComponentProps<'h4'>) => (
       <h1
-        className="mt-2 text-xl font-mono font-bold tracking-tight"
+        className="mt-8 text-xl font-mono font-bold tracking-tight"
         {...props}
       />
     ),
     h5: (props: ComponentProps<'h5'>) => (
       <h1
-        className="mt-2 text-lg font-mono font-bold tracking-tight"
+        className="mt-8 text-lg font-mono font-bold tracking-tight"
         {...props}
       />
     ),
     h6: (props: ComponentProps<'h6'>) => (
       <h1
-        className="mt-2 text-base font-mono font-bold tracking-tight"
+        className="mt-8 text-base font-mono font-bold tracking-tight"
         {...props}
       />
     ),
